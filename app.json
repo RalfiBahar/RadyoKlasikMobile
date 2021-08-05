@@ -2,7 +2,7 @@
   "expo": {
     "name": "Radyo Klasik",
     "slug": "Radyo-Klasik",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
@@ -18,14 +18,18 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "buildNumber": "1.0.1"
+      "buildNumber": "1.1.0"
+    },
+    "notification": {
+      "icon": "./assets/notifIcon.png",
+      "iosDisplayInForeground": true
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "android": {
       "package": "com.baharralfi.radyoklasik",
-      "versionCode": 2
+      "versionCode": 3
     }
   }
 }

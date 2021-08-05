@@ -23,6 +23,12 @@ import { Audio } from 'expo-av';
 import { Asset } from 'expo-asset';
 import AppLoading from 'expo-app-loading';
 import { normalize } from './helpers'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import * as Notifications from 'expo-notifications';
+
+import firebase from './helpers/firebase';
+import 'firebase/firestore'
+
 const RED = "#ef5350"
 const BLUE = "#4A8EDB"
 const WIDTH = Dimensions.get("screen").width
@@ -45,8 +51,44 @@ export default class App extends React.Component {
     pushCode: "",
   };
 
-  componentDidMount(){
+  async componentDidMount(){
+
+    const hasPush = await AsyncStorage.getItem('hashPush')
+    if(!hasPush){
+      await AsyncStorage.setItem('hasPush', 'true')
+      this.getPushNotificationPermissions()
+    }    
+
     this.timer = setInterval(()=> this.getSongData(), 1000)
+  }
+
+  getPushNotificationPermissions = async () => {
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+
+    if (existingStatus !== 'granted') {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+
+    if (finalStatus !== 'granted') {
+      return;
+    }
+    //console.log(finalStatus)
+    const push = await Notifications.getExpoPushTokenAsync();
+    const id = Math.random().toString(36).substring(7);
+    this.storePush(push, id);
+    //console.log("Notification Token: ", await Notifications.getExpoPushTokenAsync());
+  }
+
+  storePush(pushCode, userId) {
+    const db = firebase.firestore();
+    db.collection("users").doc(pushCode.data).set({
+        push: pushCode,
+        id: userId,
+      }).then(() => {
+      //console.log('User added!');
+    });
   }
 
   async _playRecording() {
